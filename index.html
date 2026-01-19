@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>4th Down Decision Tool | Football Analytics</title>
+    <title>Lions 4th Down Decision Tool | Football Analytics</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -76,6 +76,18 @@
             font-size: 1.1rem;
             max-width: 600px;
             margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .lion-logo {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
         }
 
         /* Main Content Grid */
@@ -808,8 +820,39 @@
 <body>
     <div class="app-container">
         <header class="header">
-            <h1>🏈 4th Down Decision Tool</h1>
-            <p>Data-driven recommendations to help coaches make the right call on 4th down</p>
+            <div class="logo-container">
+                <svg class="lion-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Lion head silhouette -->
+                    <defs>
+                        <linearGradient id="lionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Mane -->
+                    <ellipse cx="50" cy="52" rx="42" ry="40" fill="url(#lionGradient)"/>
+                    <!-- Face -->
+                    <ellipse cx="50" cy="55" rx="28" ry="26" fill="#92400e"/>
+                    <!-- Forehead -->
+                    <ellipse cx="50" cy="45" rx="20" ry="15" fill="#b45309"/>
+                    <!-- Eyes -->
+                    <ellipse cx="40" cy="50" rx="5" ry="4" fill="white"/>
+                    <ellipse cx="60" cy="50" rx="5" ry="4" fill="white"/>
+                    <circle cx="41" cy="50" r="2.5" fill="#1f2937"/>
+                    <circle cx="61" cy="50" r="2.5" fill="#1f2937"/>
+                    <!-- Nose -->
+                    <ellipse cx="50" cy="62" rx="6" ry="5" fill="#1f2937"/>
+                    <!-- Mouth -->
+                    <path d="M44 68 Q50 74 56 68" stroke="#1f2937" stroke-width="2" fill="none"/>
+                    <!-- Ears -->
+                    <circle cx="25" cy="30" r="8" fill="url(#lionGradient)"/>
+                    <circle cx="75" cy="30" r="8" fill="url(#lionGradient)"/>
+                    <circle cx="25" cy="30" r="5" fill="#92400e"/>
+                    <circle cx="75" cy="30" r="5" fill="#92400e"/>
+                </svg>
+            </div>
+            <h1>Lions 4th Down Decision Tool</h1>
+            <p>Data-driven recommendations to help the Lions coaching staff make the right call on 4th down</p>
         </header>
 
         <!-- Quick Scenarios -->
@@ -844,13 +887,13 @@
                             <div class="first-down-marker" id="firstDownMarker"></div>
                         </div>
                         <div class="yard-labels">
-                            <span>Own</span>
+                            <span>VIS</span>
                             <span>20</span>
                             <span>40</span>
                             <span>50</span>
                             <span>40</span>
                             <span>20</span>
-                            <span>OPP</span>
+                            <span>LIONS</span>
                         </div>
                     </div>
 
@@ -885,12 +928,12 @@
                         <label>Score</label>
                         <div class="score-inputs">
                             <div class="score-team">
-                                <label>Your Team</label>
+                                <label>Lions</label>
                                 <input type="number" id="yourScore" min="0" max="99" value="14">
                             </div>
                             <div class="score-separator">-</div>
                             <div class="score-team">
-                                <label>Opponent</label>
+                                <label>Visitors</label>
                                 <input type="number" id="oppScore" min="0" max="99" value="17">
                             </div>
                         </div>
@@ -926,7 +969,7 @@
                     <!-- Timeouts -->
                     <div class="form-row">
                         <div class="form-group">
-                            <label>Your Timeouts</label>
+                            <label>Lions Timeouts</label>
                             <div class="timeout-selector">
                                 <button class="timeout-btn" data-to="0" onclick="selectTimeout('your', 0)">0</button>
                                 <button class="timeout-btn" data-to="1" onclick="selectTimeout('your', 1)">1</button>
@@ -935,7 +978,7 @@
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Opponent Timeouts</label>
+                            <label>Visitors Timeouts</label>
                             <div class="timeout-selector" id="oppTimeouts">
                                 <button class="timeout-btn" data-to="0" onclick="selectTimeout('opp', 0)">0</button>
                                 <button class="timeout-btn" data-to="1" onclick="selectTimeout('opp', 1)">1</button>
@@ -961,8 +1004,8 @@
                 <div class="card-body">
                     <!-- Offensive Strength -->
                     <div class="form-group">
-                        <label>Your Offensive Strength
-                            <span class="info-icon" title="How good is your offense at converting short-yardage situations?">?</span>
+                        <label>Lions Offensive Strength
+                            <span class="info-icon" title="How good is the Lions offense at converting short-yardage situations?">?</span>
                         </label>
                         <input type="range" id="offenseStrength" min="1" max="10" value="6" oninput="updateStrengthDisplay()">
                         <div class="strength-visual">
@@ -975,8 +1018,8 @@
 
                     <!-- Defensive Strength -->
                     <div class="form-group">
-                        <label>Opponent's Defensive Strength
-                            <span class="info-icon" title="How good is their defense at stopping short-yardage plays?">?</span>
+                        <label>Visitors Defensive Strength
+                            <span class="info-icon" title="How good is the visitors' defense at stopping short-yardage plays?">?</span>
                         </label>
                         <input type="range" id="defenseStrength" min="1" max="10" value="5" oninput="updateStrengthDisplay()">
                         <div class="strength-visual">
@@ -989,8 +1032,8 @@
 
                     <!-- Kicker Strength -->
                     <div class="form-group">
-                        <label>Kicker Accuracy
-                            <span class="info-icon" title="Your kicker's overall accuracy on field goal attempts">?</span>
+                        <label>Lions Kicker Accuracy
+                            <span class="info-icon" title="Lions kicker's overall accuracy on field goal attempts">?</span>
                         </label>
                         <input type="range" id="kickerStrength" min="1" max="10" value="7" oninput="updateStrengthDisplay()">
                         <div class="strength-visual">
@@ -1003,8 +1046,8 @@
 
                     <!-- Punter Strength -->
                     <div class="form-group">
-                        <label>Punter Quality
-                            <span class="info-icon" title="Your punter's ability to flip field position">?</span>
+                        <label>Lions Punter Quality
+                            <span class="info-icon" title="Lions punter's ability to flip field position">?</span>
                         </label>
                         <input type="range" id="punterStrength" min="1" max="10" value="6" oninput="updateStrengthDisplay()">
                         <div class="strength-visual">
@@ -1044,9 +1087,9 @@
                         </label>
                         <input type="range" id="momentum" min="-5" max="5" value="0" oninput="updateMomentum()">
                         <div class="range-labels">
-                            <span>Opponent</span>
+                            <span>Visitors</span>
                             <span>Neutral</span>
-                            <span>Your Team</span>
+                            <span>Lions</span>
                         </div>
                         <div class="range-value" id="momentumValue">Neutral</div>
                     </div>
@@ -1143,8 +1186,8 @@
         </div>
 
         <footer class="footer">
-            <p>4th Down Decision Tool | Built for Football Coaches</p>
-            <p style="margin-top: 8px; font-size: 0.8rem;">Based on NFL/College analytics data. Always consider your team's specific strengths and game context.</p>
+            <p>Lions 4th Down Decision Tool | Built for Lions Coaching Staff</p>
+            <p style="margin-top: 8px; font-size: 0.8rem;">Based on NFL/College analytics data. Always consider the Lions' specific strengths and game context.</p>
         </footer>
     </div>
 
@@ -1422,8 +1465,8 @@
             } else if (state.fieldPosition >= 70) {
                 factors.push({
                     type: 'negative',
-                    title: 'Deep in Own Territory',
-                    desc: 'Failed conversion gives opponent great field position'
+                    title: 'Deep in Lions Territory',
+                    desc: 'Failed conversion gives visitors great field position'
                 });
             }
 
@@ -1471,7 +1514,7 @@
             if (state.offenseStrength >= 7) {
                 factors.push({
                     type: 'positive',
-                    title: 'Strong Offense',
+                    title: 'Strong Lions Offense',
                     desc: 'Above-average conversion ability'
                 });
             }
@@ -1479,7 +1522,7 @@
             if (state.defenseStrength >= 7) {
                 factors.push({
                     type: 'negative',
-                    title: 'Tough Opposing Defense',
+                    title: 'Tough Visitors Defense',
                     desc: 'Lower conversion probability against elite defense'
                 });
             }
@@ -1505,12 +1548,12 @@
                 factors.push({
                     type: 'positive',
                     title: 'Positive Momentum',
-                    desc: 'Your team has the momentum - capitalize on it'
+                    desc: 'Lions have the momentum - capitalize on it'
                 });
             } else if (state.momentum <= -3) {
                 factors.push({
                     type: 'neutral',
-                    title: 'Momentum Against You',
+                    title: 'Momentum Against Lions',
                     desc: 'Consider if going for it could shift momentum'
                 });
             }
@@ -1697,11 +1740,11 @@
             state.momentum = momentum;
             
             let label;
-            if (momentum <= -4) label = 'Strong Opponent';
-            else if (momentum <= -2) label = 'Opponent Favored';
+            if (momentum <= -4) label = 'Strong Visitors';
+            else if (momentum <= -2) label = 'Visitors Favored';
             else if (momentum < 2) label = 'Neutral';
-            else if (momentum < 4) label = 'Your Favor';
-            else label = 'Strong Momentum';
+            else if (momentum < 4) label = 'Lions Favored';
+            else label = 'Strong Lions';
             
             document.getElementById('momentumValue').textContent = label;
             calculateDecision();
