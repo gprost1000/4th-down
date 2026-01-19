@@ -1,6 +1,6 @@
-# 🏈 4th Down Decision Tool
+# 🦁 Lions 4th Down Decision Tool
 
-A data-driven web application that helps football coaches make optimal decisions on 4th down situations. Built with modern analytics principles and an intuitive user interface.
+A data-driven web application built for the Lions coaching staff to make optimal decisions on 4th down situations. Features Lions vs Visitors branding with modern analytics principles and an intuitive user interface.
 
 ## Features
 
@@ -12,13 +12,13 @@ A data-driven web application that helps football coaches make optimal decisions
 - **Timeouts** - Both team's remaining timeouts
 
 ### Team & Situational Factors
-- **Offensive Strength** - Your team's short-yardage conversion ability
-- **Defensive Strength** - Opponent's defensive quality
-- **Kicker Accuracy** - Field goal success probability adjustment
-- **Punter Quality** - Expected punt distance and placement
+- **Lions Offensive Strength** - Lions' short-yardage conversion ability
+- **Visitors Defensive Strength** - Visitors' defensive quality
+- **Lions Kicker Accuracy** - Field goal success probability adjustment
+- **Lions Punter Quality** - Expected punt distance and placement
 - **Weather Conditions** - Clear, windy, rain, or snow impacts
 - **Game Context** - Regular season, rivalry, playoff, or championship
-- **Momentum** - Current game momentum indicator
+- **Momentum** - Current game momentum indicator (Lions vs Visitors)
 
 ### Decision Analytics
 - **Three Options Compared**: Go For It, Punt, or Field Goal
@@ -42,13 +42,13 @@ Pre-loaded scenarios for common situations:
 - **4th & 3 (Midfield)** - Classic go/punt dilemma
 - **Trailing Late (2-min)** - Desperate comeback situation
 - **FG Range Decision** - Kick vs. go for more points
-- **Own Territory** - Risk vs. reward deep in your own end
+- **Lions Territory** - Risk vs. reward deep in Lions' own end
 
 ## How to Use
 
 1. **Open `index.html`** in any modern web browser
 2. **Set the game situation** using the sliders and inputs
-3. **Adjust team factors** to match your teams' strengths
+3. **Adjust team factors** to match Lions and Visitors strengths
 4. **Click "Calculate Recommendation"** or adjustments auto-calculate
 5. **Review the analysis** including factors and probability breakdown
 
@@ -65,10 +65,10 @@ Based on NFL historical data by yards to go:
 
 ### Expected Points Model
 Field position-based expected points:
-- Opponent's 5 yard line: ~5.0 EP
-- Opponent's 20: ~2.9 EP
+- Visitors' 5 yard line: ~5.0 EP
+- Visitors' 20: ~2.9 EP
 - Midfield: ~0.5 EP
-- Own 20: ~-0.7 EP
+- Lions' 20: ~-0.7 EP
 
 ### Adjustments Applied
 - Offensive/defensive strength modifiers
@@ -106,4 +106,4 @@ Analytics model inspired by NFL Next Gen Stats and academic research on 4th down
 
 ---
 
-*Note: This tool provides data-driven recommendations but should be used alongside coaching judgment and team-specific knowledge. Always consider your unique team dynamics and game situation.*
+*Note: This tool provides data-driven recommendations but should be used alongside coaching judgment and team-specific knowledge. Always consider the Lions' unique dynamics and game situation.*
