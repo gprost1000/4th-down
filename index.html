@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lions 4th Down Decision Tool | Football Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a5f2a;
+            --primary-dark: #134620;
+            --primary-light: #2d8f42;
+            --accent: #f59e0b;
+            --accent-light: #fbbf24;
+            --danger: #dc2626;
+            --danger-light: #ef4444;
+            --success: #16a34a;
+            --blue: #2563eb;
+            --blue-light: #3b82f6;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+            min-height: 100vh;
+            color: var(--gray-800);
+            line-height: 1.6;
+        }
+
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            padding: 40px 20px 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #fff 0%, #94a3b8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            color: var(--gray-400);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .lion-logo {
+            width: 100px;
+            height: 100px;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
+        }
+
+        /* Main Content Grid */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 24px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-header.blue {
+            background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
+        }
+
+        .card-header.amber {
+            background: linear-gradient(135deg, var(--accent) 0%, #d97706 100%);
+        }
+
+        .card-header svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        /* Field Visual */
+        .field-container {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .field {
+            background: linear-gradient(90deg, 
+                var(--primary-dark) 0%, var(--primary-dark) 10%,
+                var(--primary) 10%, var(--primary) 20%,
+                var(--primary-dark) 20%, var(--primary-dark) 30%,
+                var(--primary) 30%, var(--primary) 40%,
+                var(--primary-dark) 40%, var(--primary-dark) 50%,
+                var(--primary) 50%, var(--primary) 60%,
+                var(--primary-dark) 60%, var(--primary-dark) 70%,
+                var(--primary) 70%, var(--primary) 80%,
+                var(--primary-dark) 80%, var(--primary-dark) 90%,
+                var(--primary) 90%, var(--primary) 100%
+            );
+            height: 80px;
+            border-radius: 8px;
+            position: relative;
+            border: 3px solid white;
+        }
+
+        .field::before,
+        .field::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 10%;
+            background: var(--danger);
+        }
+
+        .field::before {
+            left: 0;
+            border-radius: 5px 0 0 5px;
+        }
+
+        .field::after {
+            right: 0;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .ball-marker {
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            z-index: 10;
+            transition: left 0.3s ease;
+        }
+
+        .first-down-marker {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--accent);
+            z-index: 5;
+            transition: left 0.3s ease;
+        }
+
+        .yard-labels {
+            display: flex;
+            justify-content: space-between;
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 8px;
+            padding: 0 5%;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 500px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        .input-with-unit {
+            position: relative;
+        }
+
+        .input-with-unit input {
+            padding-right: 50px;
+        }
+
+        .input-unit {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray-400);
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: var(--gray-50);
+        }
+
+        input[type="number"]:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(26, 95, 42, 0.1);
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-200);
+            outline: none;
+            -webkit-appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            box-shadow: var(--shadow-md);
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .range-value {
+            text-align: center;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.5rem;
+            margin-top: 8px;
+        }
+
+        /* Timeout Buttons */
+        .timeout-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .timeout-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--gray-200);
+            background: var(--gray-50);
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gray-600);
+        }
+
+        .timeout-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .timeout-btn:hover:not(.active) {
+            border-color: var(--primary-light);
+            background: var(--gray-100);
+        }
+
+        /* Quarter Buttons */
+        .quarter-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .quarter-btn {
+            flex: 1;
+            padding: 10px 8px;
+            border: 2px solid var(--gray-200);
+            background: var(--gray-50);
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gray-600);
+        }
+
+        .quarter-btn.active {
+            border-color: var(--blue);
+            background: var(--blue);
+            color: white;
+        }
+
+        .quarter-btn:hover:not(.active) {
+            border-color: var(--blue-light);
+            background: var(--gray-100);
+        }
+
+        /* Score Input */
+        .score-inputs {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .score-team {
+            flex: 1;
+            text-align: center;
+        }
+
+        .score-team label {
+            margin-bottom: 8px;
+        }
+
+        .score-team input {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            padding: 12px;
+        }
+
+        .score-separator {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-400);
+            padding-top: 24px;
+        }
+
+        /* Decision Panel */
+        .decision-panel {
+            background: white;
+            border-radius: 16px;
+            box-shadow: var(--shadow-xl);
+            overflow: hidden;
+        }
+
+        .decision-header {
+            padding: 20px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .decision-header h2 {
+            font-size: 1.5rem;
+            color: var(--gray-800);
+        }
+
+        .decision-result {
+            padding: 32px 24px;
+            text-align: center;
+        }
+
+        .recommendation {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            padding: 20px;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation.go-for-it {
+            background: linear-gradient(135deg, var(--success) 0%, #15803d 100%);
+            color: white;
+        }
+
+        .recommendation.punt {
+            background: linear-gradient(135deg, var(--blue) 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .recommendation.field-goal {
+            background: linear-gradient(135deg, var(--accent) 0%, #d97706 100%);
+            color: white;
+        }
+
+        .confidence-meter {
+            margin: 24px 0;
+        }
+
+        .confidence-label {
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .confidence-bar {
+            height: 12px;
+            background: var(--gray-200);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: all 0.5s ease;
+        }
+
+        .confidence-fill.high {
+            background: linear-gradient(90deg, var(--success) 0%, #22c55e 100%);
+        }
+
+        .confidence-fill.medium {
+            background: linear-gradient(90deg, var(--accent) 0%, #fbbf24 100%);
+        }
+
+        .confidence-fill.low {
+            background: linear-gradient(90deg, var(--danger) 0%, #f87171 100%);
+        }
+
+        .confidence-value {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--gray-700);
+            margin-top: 8px;
+        }
+
+        /* Options Comparison */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            padding: 24px;
+            background: var(--gray-50);
+        }
+
+        @media (max-width: 600px) {
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid var(--gray-200);
+            transition: all 0.3s ease;
+        }
+
+        .option-card.recommended {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.2);
+        }
+
+        .option-card h3 {
+            font-size: 1rem;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .option-card .value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gray-800);
+        }
+
+        .option-card .label {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+        }
+
+        .option-card.recommended .value {
+            color: var(--success);
+        }
+
+        /* Analysis Section */
+        .analysis-section {
+            padding: 24px;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        .analysis-section h3 {
+            font-size: 1.1rem;
+            color: var(--gray-700);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .factor-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .factor-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--gray-50);
+            border-radius: 10px;
+        }
+
+        .factor-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .factor-icon.positive {
+            background: #dcfce7;
+            color: var(--success);
+        }
+
+        .factor-icon.negative {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .factor-icon.neutral {
+            background: #fef3c7;
+            color: var(--accent);
+        }
+
+        .factor-text {
+            flex: 1;
+        }
+
+        .factor-text strong {
+            display: block;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+        }
+
+        .factor-text span {
+            color: var(--gray-500);
+            font-size: 0.85rem;
+        }
+
+        /* Probability Breakdown */
+        .prob-breakdown {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        @media (max-width: 500px) {
+            .prob-breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .prob-item {
+            background: var(--gray-50);
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .prob-item label {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+            margin-bottom: 4px;
+        }
+
+        .prob-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        /* Calculate Button */
+        .calculate-btn {
+            width: 100%;
+            padding: 16px 24px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 24px;
+        }
+
+        .calculate-btn:hover {
+            background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Team Strength Slider */
+        .strength-visual {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .strength-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--danger) 0%, var(--accent) 50%, var(--success) 100%);
+            transition: width 0.3s ease;
+        }
+
+        .strength-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Info Tooltip */
+        .info-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 18px;
+            height: 18px;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: help;
+            margin-left: 6px;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 32px;
+            color: var(--gray-400);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .recommendation {
+            animation: pulse 2s infinite;
+        }
+
+        /* Quick Scenario Buttons */
+        .quick-scenarios {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .scenario-btn {
+            padding: 8px 16px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .scenario-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Weather Toggle */
+        .toggle-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--gray-200);
+            background: var(--gray-50);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--gray-600);
+        }
+
+        .toggle-btn.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        .toggle-btn:hover:not(.active) {
+            border-color: var(--gray-300);
+            background: var(--gray-100);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo-container">
+                <svg class="lion-logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Lion head silhouette -->
+                    <defs>
+                        <linearGradient id="lionGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Mane -->
+                    <ellipse cx="50" cy="52" rx="42" ry="40" fill="url(#lionGradient)"/>
+                    <!-- Face -->
+                    <ellipse cx="50" cy="55" rx="28" ry="26" fill="#92400e"/>
+                    <!-- Forehead -->
+                    <ellipse cx="50" cy="45" rx="20" ry="15" fill="#b45309"/>
+                    <!-- Eyes -->
+                    <ellipse cx="40" cy="50" rx="5" ry="4" fill="white"/>
+                    <ellipse cx="60" cy="50" rx="5" ry="4" fill="white"/>
+                    <circle cx="41" cy="50" r="2.5" fill="#1f2937"/>
+                    <circle cx="61" cy="50" r="2.5" fill="#1f2937"/>
+                    <!-- Nose -->
+                    <ellipse cx="50" cy="62" rx="6" ry="5" fill="#1f2937"/>
+                    <!-- Mouth -->
+                    <path d="M44 68 Q50 74 56 68" stroke="#1f2937" stroke-width="2" fill="none"/>
+                    <!-- Ears -->
+                    <circle cx="25" cy="30" r="8" fill="url(#lionGradient)"/>
+                    <circle cx="75" cy="30" r="8" fill="url(#lionGradient)"/>
+                    <circle cx="25" cy="30" r="5" fill="#92400e"/>
+                    <circle cx="75" cy="30" r="5" fill="#92400e"/>
+                </svg>
+            </div>
+            <h1>Lions 4th Down Decision Tool</h1>
+            <p>Data-driven recommendations to help the Lions coaching staff make the right call on 4th down</p>
+        </header>
+
+        <!-- Quick Scenarios -->
+        <div class="card" style="margin-bottom: 24px;">
+            <div class="card-body">
+                <label style="margin-bottom: 12px;">Quick Scenarios:</label>
+                <div class="quick-scenarios">
+                    <button class="scenario-btn" onclick="loadScenario('short')">4th & Short (Goal Line)</button>
+                    <button class="scenario-btn" onclick="loadScenario('midfield')">4th & 3 (Midfield)</button>
+                    <button class="scenario-btn" onclick="loadScenario('desperate')">Trailing Late (2-min)</button>
+                    <button class="scenario-btn" onclick="loadScenario('fgRange')">FG Range Decision</button>
+                    <button class="scenario-btn" onclick="loadScenario('ownTerritory')">Own Territory</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-grid">
+            <!-- Left Column - Game Situation -->
+            <div class="card">
+                <div class="card-header">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    Game Situation
+                </div>
+                <div class="card-body">
+                    <!-- Field Visualization -->
+                    <div class="field-container">
+                        <div class="field">
+                            <div class="ball-marker" id="ballMarker"></div>
+                            <div class="first-down-marker" id="firstDownMarker"></div>
+                        </div>
+                        <div class="yard-labels">
+                            <span>VIS</span>
+                            <span>20</span>
+                            <span>40</span>
+                            <span>50</span>
+                            <span>40</span>
+                            <span>20</span>
+                            <span>LIONS</span>
+                        </div>
+                    </div>
+
+                    <!-- Field Position -->
+                    <div class="form-group">
+                        <label>Field Position (Yards to Opponent's End Zone)
+                            <span class="info-icon" title="Distance from the opponent's goal line. 50 = midfield, 1 = goal line">?</span>
+                        </label>
+                        <input type="range" id="fieldPosition" min="1" max="99" value="35" oninput="updateFieldVisual()">
+                        <div class="range-labels">
+                            <span>Goal Line</span>
+                            <span>Midfield</span>
+                            <span>Own End Zone</span>
+                        </div>
+                        <div class="range-value"><span id="fieldPositionValue">35</span> yard line</div>
+                    </div>
+
+                    <!-- Yards to Go -->
+                    <div class="form-group">
+                        <label>Yards to Go for First Down</label>
+                        <input type="range" id="yardsToGo" min="1" max="15" value="3" oninput="updateFieldVisual()">
+                        <div class="range-labels">
+                            <span>Inches</span>
+                            <span>Medium</span>
+                            <span>Long</span>
+                        </div>
+                        <div class="range-value"><span id="yardsToGoValue">3</span> yards</div>
+                    </div>
+
+                    <!-- Score -->
+                    <div class="form-group">
+                        <label>Score</label>
+                        <div class="score-inputs">
+                            <div class="score-team">
+                                <label>Lions</label>
+                                <input type="number" id="yourScore" min="0" max="99" value="14">
+                            </div>
+                            <div class="score-separator">-</div>
+                            <div class="score-team">
+                                <label>Visitors</label>
+                                <input type="number" id="oppScore" min="0" max="99" value="17">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quarter -->
+                    <div class="form-group">
+                        <label>Quarter</label>
+                        <div class="quarter-selector">
+                            <button class="quarter-btn" data-quarter="1" onclick="selectQuarter(1)">1st</button>
+                            <button class="quarter-btn active" data-quarter="2" onclick="selectQuarter(2)">2nd</button>
+                            <button class="quarter-btn" data-quarter="3" onclick="selectQuarter(3)">3rd</button>
+                            <button class="quarter-btn" data-quarter="4" onclick="selectQuarter(4)">4th</button>
+                            <button class="quarter-btn" data-quarter="5" onclick="selectQuarter(5)">OT</button>
+                        </div>
+                    </div>
+
+                    <!-- Time Remaining -->
+                    <div class="form-group">
+                        <label>Time Remaining in Quarter</label>
+                        <div class="form-row">
+                            <div class="input-with-unit">
+                                <input type="number" id="minutes" min="0" max="15" value="8" placeholder="Min">
+                                <span class="input-unit">min</span>
+                            </div>
+                            <div class="input-with-unit">
+                                <input type="number" id="seconds" min="0" max="59" value="30" placeholder="Sec">
+                                <span class="input-unit">sec</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Timeouts -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Lions Timeouts</label>
+                            <div class="timeout-selector">
+                                <button class="timeout-btn" data-to="0" onclick="selectTimeout('your', 0)">0</button>
+                                <button class="timeout-btn" data-to="1" onclick="selectTimeout('your', 1)">1</button>
+                                <button class="timeout-btn" data-to="2" onclick="selectTimeout('your', 2)">2</button>
+                                <button class="timeout-btn active" data-to="3" onclick="selectTimeout('your', 3)">3</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Visitors Timeouts</label>
+                            <div class="timeout-selector" id="oppTimeouts">
+                                <button class="timeout-btn" data-to="0" onclick="selectTimeout('opp', 0)">0</button>
+                                <button class="timeout-btn" data-to="1" onclick="selectTimeout('opp', 1)">1</button>
+                                <button class="timeout-btn" data-to="2" onclick="selectTimeout('opp', 2)">2</button>
+                                <button class="timeout-btn active" data-to="3" onclick="selectTimeout('opp', 3)">3</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Team Factors -->
+            <div class="card">
+                <div class="card-header blue">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="9" cy="7" r="4"/>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                    </svg>
+                    Team & Situational Factors
+                </div>
+                <div class="card-body">
+                    <!-- Offensive Strength -->
+                    <div class="form-group">
+                        <label>Lions Offensive Strength
+                            <span class="info-icon" title="How good is the Lions offense at converting short-yardage situations?">?</span>
+                        </label>
+                        <input type="range" id="offenseStrength" min="1" max="10" value="6" oninput="updateStrengthDisplay()">
+                        <div class="strength-visual">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="offenseStrengthFill" style="width: 60%"></div>
+                            </div>
+                            <span class="strength-label" id="offenseStrengthLabel">Above Avg</span>
+                        </div>
+                    </div>
+
+                    <!-- Defensive Strength -->
+                    <div class="form-group">
+                        <label>Visitors Defensive Strength
+                            <span class="info-icon" title="How good is the visitors' defense at stopping short-yardage plays?">?</span>
+                        </label>
+                        <input type="range" id="defenseStrength" min="1" max="10" value="5" oninput="updateStrengthDisplay()">
+                        <div class="strength-visual">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="defenseStrengthFill" style="width: 50%"></div>
+                            </div>
+                            <span class="strength-label" id="defenseStrengthLabel">Average</span>
+                        </div>
+                    </div>
+
+                    <!-- Kicker Strength -->
+                    <div class="form-group">
+                        <label>Lions Kicker Accuracy
+                            <span class="info-icon" title="Lions kicker's overall accuracy on field goal attempts">?</span>
+                        </label>
+                        <input type="range" id="kickerStrength" min="1" max="10" value="7" oninput="updateStrengthDisplay()">
+                        <div class="strength-visual">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="kickerStrengthFill" style="width: 70%"></div>
+                            </div>
+                            <span class="strength-label" id="kickerStrengthLabel">Good</span>
+                        </div>
+                    </div>
+
+                    <!-- Punter Strength -->
+                    <div class="form-group">
+                        <label>Lions Punter Quality
+                            <span class="info-icon" title="Lions punter's ability to flip field position">?</span>
+                        </label>
+                        <input type="range" id="punterStrength" min="1" max="10" value="6" oninput="updateStrengthDisplay()">
+                        <div class="strength-visual">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="punterStrengthFill" style="width: 60%"></div>
+                            </div>
+                            <span class="strength-label" id="punterStrengthLabel">Above Avg</span>
+                        </div>
+                    </div>
+
+                    <!-- Weather Conditions -->
+                    <div class="form-group">
+                        <label>Weather Conditions</label>
+                        <div class="toggle-group">
+                            <button class="toggle-btn active" data-weather="clear" onclick="selectWeather('clear')">☀️ Clear</button>
+                            <button class="toggle-btn" data-weather="wind" onclick="selectWeather('wind')">💨 Windy</button>
+                            <button class="toggle-btn" data-weather="rain" onclick="selectWeather('rain')">🌧️ Rain</button>
+                            <button class="toggle-btn" data-weather="snow" onclick="selectWeather('snow')">❄️ Snow</button>
+                        </div>
+                    </div>
+
+                    <!-- Game Context -->
+                    <div class="form-group">
+                        <label>Game Context</label>
+                        <select id="gameContext">
+                            <option value="regular">Regular Season Game</option>
+                            <option value="rivalry">Rivalry Game</option>
+                            <option value="playoff">Playoff Game</option>
+                            <option value="championship">Championship Game</option>
+                        </select>
+                    </div>
+
+                    <!-- Momentum -->
+                    <div class="form-group">
+                        <label>Current Momentum
+                            <span class="info-icon" title="Who has the momentum in this game?">?</span>
+                        </label>
+                        <input type="range" id="momentum" min="-5" max="5" value="0" oninput="updateMomentum()">
+                        <div class="range-labels">
+                            <span>Visitors</span>
+                            <span>Neutral</span>
+                            <span>Lions</span>
+                        </div>
+                        <div class="range-value" id="momentumValue">Neutral</div>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculateDecision()">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22,4 12,14.01 9,11.01"/>
+                        </svg>
+                        Calculate Recommendation
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Decision Panel -->
+        <div class="decision-panel">
+            <div class="decision-header">
+                <h2>📊 Analysis & Recommendation</h2>
+            </div>
+            
+            <div class="decision-result">
+                <div class="recommendation" id="recommendation">
+                    GO FOR IT
+                </div>
+                
+                <div class="confidence-meter">
+                    <div class="confidence-label">Decision Confidence</div>
+                    <div class="confidence-bar">
+                        <div class="confidence-fill high" id="confidenceFill" style="width: 78%"></div>
+                    </div>
+                    <div class="confidence-value"><span id="confidenceValue">78</span>% Confident</div>
+                </div>
+            </div>
+
+            <!-- Options Comparison -->
+            <div class="options-grid">
+                <div class="option-card recommended" id="goForItCard">
+                    <h3>🏃 Go For It</h3>
+                    <div class="value" id="goForItValue">+2.1</div>
+                    <div class="label">Expected Points Added</div>
+                </div>
+                <div class="option-card" id="puntCard">
+                    <h3>👟 Punt</h3>
+                    <div class="value" id="puntValue">+0.4</div>
+                    <div class="label">Expected Points Added</div>
+                </div>
+                <div class="option-card" id="fgCard">
+                    <h3>🥅 Field Goal</h3>
+                    <div class="value" id="fgValue">+1.8</div>
+                    <div class="label">Expected Points Added</div>
+                </div>
+            </div>
+
+            <!-- Analysis Section -->
+            <div class="analysis-section">
+                <h3>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14,2 14,8 20,8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                        <polyline points="10,9 9,9 8,9"/>
+                    </svg>
+                    Key Factors in This Decision
+                </h3>
+                <div class="factor-list" id="factorList">
+                    <!-- Factors will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Probability Breakdown -->
+            <div class="analysis-section">
+                <h3>📈 Probability Breakdown</h3>
+                <div class="prob-breakdown">
+                    <div class="prob-item">
+                        <label>Conversion Probability</label>
+                        <div class="value" id="conversionProb">62%</div>
+                    </div>
+                    <div class="prob-item">
+                        <label>Field Goal Success</label>
+                        <div class="value" id="fgProb">78%</div>
+                    </div>
+                    <div class="prob-item">
+                        <label>Expected Punt Yards</label>
+                        <div class="value" id="puntYards">42 yds</div>
+                    </div>
+                    <div class="prob-item">
+                        <label>Win Probability Impact</label>
+                        <div class="value" id="winProbImpact">+4.2%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="footer">
+            <p>Lions 4th Down Decision Tool | Built for Lions Coaching Staff</p>
+            <p style="margin-top: 8px; font-size: 0.8rem;">Based on NFL/College analytics data. Always consider the Lions' specific strengths and game context.</p>
+        </footer>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            fieldPosition: 35,
+            yardsToGo: 3,
+            yourScore: 14,
+            oppScore: 17,
+            quarter: 2,
+            minutes: 8,
+            seconds: 30,
+            yourTimeouts: 3,
+            oppTimeouts: 3,
+            offenseStrength: 6,
+            defenseStrength: 5,
+            kickerStrength: 7,
+            punterStrength: 6,
+            weather: 'clear',
+            gameContext: 'regular',
+            momentum: 0
+        };
+
+        // Historical conversion rates by yards to go (NFL averages)
+        const baseConversionRates = {
+            1: 0.72,
+            2: 0.62,
+            3: 0.54,
+            4: 0.48,
+            5: 0.44,
+            6: 0.40,
+            7: 0.37,
+            8: 0.34,
+            9: 0.31,
+            10: 0.29,
+            11: 0.26,
+            12: 0.24,
+            13: 0.22,
+            14: 0.20,
+            15: 0.18
+        };
+
+        // Expected points by field position (yards from opponent's end zone)
+        const expectedPointsByPosition = {
+            1: 6.0, 2: 5.8, 3: 5.5, 4: 5.2, 5: 4.9,
+            10: 4.2, 15: 3.5, 20: 2.9, 25: 2.4, 30: 1.9,
+            35: 1.5, 40: 1.1, 45: 0.8, 50: 0.5, 55: 0.3,
+            60: 0.1, 65: -0.2, 70: -0.4, 75: -0.7, 80: -1.0,
+            85: -1.3, 90: -1.6, 95: -2.0, 99: -2.5
+        };
+
+        // Field goal success rates by distance
+        function getFieldGoalProbability(yardsToEndzone, kickerStrength, weather) {
+            const fgDistance = yardsToEndzone + 17; // Add 7 yards for snap + 10 for end zone
+            
+            // Base probability curve
+            let baseProbability;
+            if (fgDistance <= 27) baseProbability = 0.95;
+            else if (fgDistance <= 37) baseProbability = 0.90;
+            else if (fgDistance <= 42) baseProbability = 0.82;
+            else if (fgDistance <= 47) baseProbability = 0.72;
+            else if (fgDistance <= 52) baseProbability = 0.60;
+            else if (fgDistance <= 57) baseProbability = 0.45;
+            else if (fgDistance <= 62) baseProbability = 0.30;
+            else baseProbability = 0.15;
+
+            // Adjust for kicker strength
+            const kickerAdjustment = (kickerStrength - 5) * 0.03;
+            
+            // Weather adjustments
+            let weatherMultiplier = 1.0;
+            if (weather === 'wind') weatherMultiplier = 0.85;
+            if (weather === 'rain') weatherMultiplier = 0.90;
+            if (weather === 'snow') weatherMultiplier = 0.80;
+
+            return Math.min(0.98, Math.max(0.05, (baseProbability + kickerAdjustment) * weatherMultiplier));
+        }
+
+        // Get conversion probability
+        function getConversionProbability() {
+            const ytg = Math.min(15, Math.max(1, state.yardsToGo));
+            let baseProbability = baseConversionRates[ytg] || 0.20;
+
+            // Adjust for offensive strength
+            const offenseAdjustment = (state.offenseStrength - 5) * 0.025;
+            
+            // Adjust for defensive strength (opponent)
+            const defenseAdjustment = (5 - state.defenseStrength) * 0.020;
+
+            // Field position adjustment (harder near goal line due to compressed field)
+            let fieldPosAdjustment = 0;
+            if (state.fieldPosition <= 5) fieldPosAdjustment = 0.05; // Easier near goal line (QB sneak, etc)
+            else if (state.fieldPosition <= 10) fieldPosAdjustment = 0.02;
+
+            // Weather adjustments
+            let weatherAdjustment = 0;
+            if (state.weather === 'rain') weatherAdjustment = -0.05;
+            if (state.weather === 'snow') weatherAdjustment = -0.08;
+            if (state.weather === 'wind') weatherAdjustment = -0.02;
+
+            // Momentum adjustment
+            const momentumAdjustment = state.momentum * 0.01;
+
+            return Math.min(0.95, Math.max(0.05, 
+                baseProbability + offenseAdjustment + defenseAdjustment + fieldPosAdjustment + weatherAdjustment + momentumAdjustment
+            ));
+        }
+
+        // Get expected punt net yards
+        function getExpectedPuntYards() {
+            let baseYards = 40 + (state.punterStrength - 5) * 2;
+            
+            // Weather adjustments
+            if (state.weather === 'wind') baseYards -= 5;
+            if (state.weather === 'rain') baseYards -= 3;
+            if (state.weather === 'snow') baseYards -= 4;
+
+            // Can't punt into end zone effectively
+            const maxPunt = Math.min(baseYards, state.fieldPosition - 10);
+            
+            return Math.max(25, maxPunt);
+        }
+
+        // Get expected points from field position
+        function getExpectedPoints(yardsToEndzone) {
+            yardsToEndzone = Math.max(1, Math.min(99, yardsToEndzone));
+            
+            // Interpolate from our expected points table
+            const positions = Object.keys(expectedPointsByPosition).map(Number).sort((a, b) => a - b);
+            
+            for (let i = 0; i < positions.length - 1; i++) {
+                if (yardsToEndzone >= positions[i] && yardsToEndzone <= positions[i + 1]) {
+                    const ratio = (yardsToEndzone - positions[i]) / (positions[i + 1] - positions[i]);
+                    return expectedPointsByPosition[positions[i]] * (1 - ratio) + 
+                           expectedPointsByPosition[positions[i + 1]] * ratio;
+                }
+            }
+            
+            return expectedPointsByPosition[99] || -2.5;
+        }
+
+        // Calculate time pressure factor
+        function getTimePressureFactor() {
+            const totalSeconds = state.minutes * 60 + state.seconds;
+            const quarterSeconds = 15 * 60;
+            
+            // Calculate total remaining time
+            let remainingQuarters = 4 - state.quarter;
+            if (state.quarter === 5) remainingQuarters = 0; // OT
+            
+            const totalRemainingSeconds = totalSeconds + (remainingQuarters * quarterSeconds);
+            
+            // If behind in 4th quarter with little time, increase aggression
+            const scoreDiff = state.yourScore - state.oppScore;
+            
+            if (state.quarter === 4 || state.quarter === 5) {
+                if (totalSeconds < 300 && scoreDiff < 0) { // Less than 5 minutes, losing
+                    return 1.5 + Math.abs(scoreDiff) * 0.05;
+                }
+                if (totalSeconds < 120 && scoreDiff < 0) { // Less than 2 minutes, losing
+                    return 2.0 + Math.abs(scoreDiff) * 0.08;
+                }
+            }
+            
+            // If winning big late, be conservative
+            if (state.quarter >= 3 && scoreDiff > 14 && totalSeconds < 600) {
+                return 0.7;
+            }
+            
+            return 1.0;
+        }
+
+        // Calculate expected value for each decision
+        function calculateExpectedValues() {
+            const conversionProb = getConversionProbability();
+            const fgProb = getFieldGoalProbability(state.fieldPosition, state.kickerStrength, state.weather);
+            const puntYards = getExpectedPuntYards();
+            const timePressure = getTimePressureFactor();
+
+            // Current expected points
+            const currentEP = getExpectedPoints(state.fieldPosition);
+
+            // GO FOR IT
+            // If successful: new first down, get expected points from that position
+            // If failed: opponent gets ball at current position
+            const successEP = state.yardsToGo >= state.fieldPosition 
+                ? 6.5 // Touchdown
+                : getExpectedPoints(state.fieldPosition - state.yardsToGo);
+            const failEP = -getExpectedPoints(100 - state.fieldPosition); // Opponent's expected points (negative for us)
+            
+            let goForItEV = (conversionProb * successEP) + ((1 - conversionProb) * failEP);
+            goForItEV *= timePressure; // Adjust for game situation
+
+            // PUNT
+            const afterPuntPosition = Math.min(99, 100 - (state.fieldPosition - puntYards));
+            const puntEV = -getExpectedPoints(afterPuntPosition) * 0.95; // 5% chance of return TD/big play
+
+            // FIELD GOAL
+            const fgSuccessEP = 3;
+            const fgFailPosition = Math.max(20, 100 - state.fieldPosition - 7); // Miss from 7 yards back
+            const fgFailEP = -getExpectedPoints(fgFailPosition);
+            let fgEV = (fgProb * fgSuccessEP) + ((1 - fgProb) * fgFailEP);
+
+            // Field goal not viable beyond ~60 yards
+            const fgDistance = state.fieldPosition + 17;
+            if (fgDistance > 65) fgEV = -999;
+
+            // Apply game context multipliers
+            const contextMultiplier = state.gameContext === 'playoff' || state.gameContext === 'championship' ? 1.1 : 1.0;
+            goForItEV *= contextMultiplier;
+
+            return {
+                goForIt: goForItEV,
+                punt: puntEV,
+                fieldGoal: fgEV,
+                conversionProb,
+                fgProb,
+                puntYards
+            };
+        }
+
+        // Determine the best decision
+        function getBestDecision() {
+            const evs = calculateExpectedValues();
+            
+            const decisions = [
+                { name: 'GO FOR IT', ev: evs.goForIt },
+                { name: 'PUNT', ev: evs.punt },
+                { name: 'FIELD GOAL', ev: evs.fieldGoal }
+            ];
+
+            decisions.sort((a, b) => b.ev - a.ev);
+            
+            const best = decisions[0];
+            const secondBest = decisions[1];
+            
+            // Calculate confidence based on EV difference
+            const evDiff = best.ev - secondBest.ev;
+            let confidence = Math.min(95, 50 + evDiff * 15);
+            
+            // Minimum confidence based on conversion probability for "go for it"
+            if (best.name === 'GO FOR IT' && evs.conversionProb < 0.35) {
+                confidence = Math.min(confidence, 60);
+            }
+
+            return {
+                decision: best.name,
+                confidence: Math.round(confidence),
+                evs: evs,
+                allDecisions: decisions
+            };
+        }
+
+        // Generate analysis factors
+        function generateFactors() {
+            const factors = [];
+            const evs = calculateExpectedValues();
+            const scoreDiff = state.yourScore - state.oppScore;
+            const totalSeconds = state.minutes * 60 + state.seconds;
+
+            // Field position factor
+            if (state.fieldPosition <= 5) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Excellent Field Position',
+                    desc: 'In the red zone - high-value scoring opportunity'
+                });
+            } else if (state.fieldPosition <= 35) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Good Field Position',
+                    desc: 'In field goal range with scoring potential'
+                });
+            } else if (state.fieldPosition >= 70) {
+                factors.push({
+                    type: 'negative',
+                    title: 'Deep in Lions Territory',
+                    desc: 'Failed conversion gives visitors great field position'
+                });
+            }
+
+            // Yards to go factor
+            if (state.yardsToGo <= 2) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Short Yardage',
+                    desc: `${state.yardsToGo} yard${state.yardsToGo > 1 ? 's' : ''} to go - high conversion rate expected`
+                });
+            } else if (state.yardsToGo >= 7) {
+                factors.push({
+                    type: 'negative',
+                    title: 'Long Yardage Situation',
+                    desc: `${state.yardsToGo} yards is a difficult conversion`
+                });
+            }
+
+            // Score/time pressure
+            if (state.quarter === 4 && scoreDiff < 0 && totalSeconds < 300) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Must-Score Situation',
+                    desc: 'Trailing late - aggressive play recommended'
+                });
+            } else if (state.quarter >= 3 && scoreDiff > 14) {
+                factors.push({
+                    type: 'neutral',
+                    title: 'Comfortable Lead',
+                    desc: 'Conservative approach may be preferred'
+                });
+            }
+
+            // Weather factors
+            if (state.weather === 'wind' || state.weather === 'rain' || state.weather === 'snow') {
+                const weatherNames = { wind: 'Windy', rain: 'Rainy', snow: 'Snowy' };
+                factors.push({
+                    type: 'negative',
+                    title: `${weatherNames[state.weather]} Conditions`,
+                    desc: 'Weather affects kicking game more than running/short passes'
+                });
+            }
+
+            // Team strengths
+            if (state.offenseStrength >= 7) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Strong Lions Offense',
+                    desc: 'Above-average conversion ability'
+                });
+            }
+            
+            if (state.defenseStrength >= 7) {
+                factors.push({
+                    type: 'negative',
+                    title: 'Tough Visitors Defense',
+                    desc: 'Lower conversion probability against elite defense'
+                });
+            }
+
+            // Field goal viability
+            const fgDistance = state.fieldPosition + 17;
+            if (fgDistance > 55) {
+                factors.push({
+                    type: 'negative',
+                    title: 'Long Field Goal',
+                    desc: `${fgDistance} yard attempt - low success probability`
+                });
+            } else if (fgDistance <= 35 && state.kickerStrength >= 6) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Makeable Field Goal',
+                    desc: `${fgDistance} yards is a high-percentage kick`
+                });
+            }
+
+            // Momentum
+            if (state.momentum >= 3) {
+                factors.push({
+                    type: 'positive',
+                    title: 'Positive Momentum',
+                    desc: 'Lions have the momentum - capitalize on it'
+                });
+            } else if (state.momentum <= -3) {
+                factors.push({
+                    type: 'neutral',
+                    title: 'Momentum Against Lions',
+                    desc: 'Consider if going for it could shift momentum'
+                });
+            }
+
+            return factors.slice(0, 5); // Return top 5 factors
+        }
+
+        // Update the UI with the decision
+        function calculateDecision() {
+            updateState();
+            
+            const result = getBestDecision();
+            const factors = generateFactors();
+            const evs = result.evs;
+
+            // Update recommendation
+            const recEl = document.getElementById('recommendation');
+            recEl.textContent = result.decision;
+            recEl.className = 'recommendation';
+            
+            if (result.decision === 'GO FOR IT') {
+                recEl.classList.add('go-for-it');
+            } else if (result.decision === 'PUNT') {
+                recEl.classList.add('punt');
+            } else {
+                recEl.classList.add('field-goal');
+            }
+
+            // Update confidence
+            document.getElementById('confidenceValue').textContent = result.confidence;
+            const confidenceFill = document.getElementById('confidenceFill');
+            confidenceFill.style.width = result.confidence + '%';
+            confidenceFill.className = 'confidence-fill';
+            if (result.confidence >= 70) confidenceFill.classList.add('high');
+            else if (result.confidence >= 50) confidenceFill.classList.add('medium');
+            else confidenceFill.classList.add('low');
+
+            // Update option cards
+            const cards = ['goForIt', 'punt', 'fg'];
+            const cardEls = [
+                document.getElementById('goForItCard'),
+                document.getElementById('puntCard'),
+                document.getElementById('fgCard')
+            ];
+            const values = [evs.goForIt, evs.punt, evs.fieldGoal];
+            const valueEls = [
+                document.getElementById('goForItValue'),
+                document.getElementById('puntValue'),
+                document.getElementById('fgValue')
+            ];
+
+            const maxEV = Math.max(...values.filter(v => v > -100));
+            
+            cardEls.forEach((card, i) => {
+                card.classList.remove('recommended');
+                if (values[i] === maxEV && values[i] > -100) {
+                    card.classList.add('recommended');
+                }
+                
+                if (values[i] < -100) {
+                    valueEls[i].textContent = 'N/A';
+                } else {
+                    valueEls[i].textContent = (values[i] >= 0 ? '+' : '') + values[i].toFixed(1);
+                }
+            });
+
+            // Update probability breakdown
+            document.getElementById('conversionProb').textContent = Math.round(evs.conversionProb * 100) + '%';
+            
+            const fgDistance = state.fieldPosition + 17;
+            if (fgDistance > 65) {
+                document.getElementById('fgProb').textContent = 'Too Far';
+            } else {
+                document.getElementById('fgProb').textContent = Math.round(evs.fgProb * 100) + '%';
+            }
+            
+            document.getElementById('puntYards').textContent = Math.round(evs.puntYards) + ' yds';
+            
+            // Win probability impact (simplified)
+            const wpImpact = (result.evs[result.decision.toLowerCase().replace(/ /g, '')] || result.evs.goForIt) * 1.5;
+            document.getElementById('winProbImpact').textContent = (wpImpact >= 0 ? '+' : '') + wpImpact.toFixed(1) + '%';
+
+            // Update factors
+            const factorList = document.getElementById('factorList');
+            factorList.innerHTML = factors.map(f => `
+                <div class="factor-item">
+                    <div class="factor-icon ${f.type}">
+                        ${f.type === 'positive' ? '✓' : f.type === 'negative' ? '✗' : '•'}
+                    </div>
+                    <div class="factor-text">
+                        <strong>${f.title}</strong>
+                        <span>${f.desc}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Update state from form inputs
+        function updateState() {
+            state.fieldPosition = parseInt(document.getElementById('fieldPosition').value);
+            state.yardsToGo = parseInt(document.getElementById('yardsToGo').value);
+            state.yourScore = parseInt(document.getElementById('yourScore').value) || 0;
+            state.oppScore = parseInt(document.getElementById('oppScore').value) || 0;
+            state.minutes = parseInt(document.getElementById('minutes').value) || 0;
+            state.seconds = parseInt(document.getElementById('seconds').value) || 0;
+            state.offenseStrength = parseInt(document.getElementById('offenseStrength').value);
+            state.defenseStrength = parseInt(document.getElementById('defenseStrength').value);
+            state.kickerStrength = parseInt(document.getElementById('kickerStrength').value);
+            state.punterStrength = parseInt(document.getElementById('punterStrength').value);
+            state.gameContext = document.getElementById('gameContext').value;
+            state.momentum = parseInt(document.getElementById('momentum').value);
+        }
+
+        // UI Helper Functions
+        function updateFieldVisual() {
+            const fieldPos = parseInt(document.getElementById('fieldPosition').value);
+            const ytg = parseInt(document.getElementById('yardsToGo').value);
+            
+            document.getElementById('fieldPositionValue').textContent = fieldPos;
+            document.getElementById('yardsToGoValue').textContent = ytg;
+            
+            // Update ball marker (10% is end zone on each side, so 80% is the field)
+            const ballPercent = 10 + ((100 - fieldPos) / 100 * 80);
+            document.getElementById('ballMarker').style.left = ballPercent + '%';
+            
+            // Update first down marker
+            const firstDownPos = Math.max(10, fieldPos - ytg);
+            const firstDownPercent = 10 + ((100 - firstDownPos) / 100 * 80);
+            document.getElementById('firstDownMarker').style.left = firstDownPercent + '%';
+            
+            // Auto-calculate
+            calculateDecision();
+        }
+
+        function selectQuarter(q) {
+            state.quarter = q;
+            document.querySelectorAll('.quarter-btn').forEach(btn => {
+                btn.classList.toggle('active', parseInt(btn.dataset.quarter) === q);
+            });
+            calculateDecision();
+        }
+
+        function selectTimeout(team, count) {
+            if (team === 'your') {
+                state.yourTimeouts = count;
+                document.querySelectorAll('.timeout-selector:not(#oppTimeouts) .timeout-btn').forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.to) === count);
+                });
+            } else {
+                state.oppTimeouts = count;
+                document.querySelectorAll('#oppTimeouts .timeout-btn').forEach(btn => {
+                    btn.classList.toggle('active', parseInt(btn.dataset.to) === count);
+                });
+            }
+            calculateDecision();
+        }
+
+        function selectWeather(weather) {
+            state.weather = weather;
+            document.querySelectorAll('.toggle-btn[data-weather]').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.weather === weather);
+            });
+            calculateDecision();
+        }
+
+        function updateStrengthDisplay() {
+            const labels = {
+                1: 'Very Weak', 2: 'Weak', 3: 'Below Avg',
+                4: 'Avg-', 5: 'Average', 6: 'Above Avg',
+                7: 'Good', 8: 'Very Good', 9: 'Elite', 10: 'Elite+'
+            };
+
+            ['offense', 'defense', 'kicker', 'punter'].forEach(type => {
+                const value = parseInt(document.getElementById(type + 'Strength').value);
+                document.getElementById(type + 'StrengthFill').style.width = (value * 10) + '%';
+                document.getElementById(type + 'StrengthLabel').textContent = labels[value];
+            });
+            
+            calculateDecision();
+        }
+
+        function updateMomentum() {
+            const momentum = parseInt(document.getElementById('momentum').value);
+            state.momentum = momentum;
+            
+            let label;
+            if (momentum <= -4) label = 'Strong Visitors';
+            else if (momentum <= -2) label = 'Visitors Favored';
+            else if (momentum < 2) label = 'Neutral';
+            else if (momentum < 4) label = 'Lions Favored';
+            else label = 'Strong Lions';
+            
+            document.getElementById('momentumValue').textContent = label;
+            calculateDecision();
+        }
+
+        // Quick scenario loaders
+        function loadScenario(scenario) {
+            switch(scenario) {
+                case 'short':
+                    document.getElementById('fieldPosition').value = 2;
+                    document.getElementById('yardsToGo').value = 1;
+                    document.getElementById('yourScore').value = 14;
+                    document.getElementById('oppScore').value = 10;
+                    selectQuarter(3);
+                    document.getElementById('minutes').value = 5;
+                    document.getElementById('seconds').value = 0;
+                    break;
+                case 'midfield':
+                    document.getElementById('fieldPosition').value = 45;
+                    document.getElementById('yardsToGo').value = 3;
+                    document.getElementById('yourScore').value = 21;
+                    document.getElementById('oppScore').value = 21;
+                    selectQuarter(4);
+                    document.getElementById('minutes').value = 8;
+                    document.getElementById('seconds').value = 0;
+                    break;
+                case 'desperate':
+                    document.getElementById('fieldPosition').value = 35;
+                    document.getElementById('yardsToGo').value = 6;
+                    document.getElementById('yourScore').value = 17;
+                    document.getElementById('oppScore').value = 24;
+                    selectQuarter(4);
+                    document.getElementById('minutes').value = 2;
+                    document.getElementById('seconds').value = 0;
+                    selectTimeout('your', 1);
+                    break;
+                case 'fgRange':
+                    document.getElementById('fieldPosition').value = 28;
+                    document.getElementById('yardsToGo').value = 4;
+                    document.getElementById('yourScore').value = 13;
+                    document.getElementById('oppScore').value = 14;
+                    selectQuarter(4);
+                    document.getElementById('minutes').value = 4;
+                    document.getElementById('seconds').value = 30;
+                    break;
+                case 'ownTerritory':
+                    document.getElementById('fieldPosition').value = 65;
+                    document.getElementById('yardsToGo').value = 2;
+                    document.getElementById('yourScore').value = 7;
+                    document.getElementById('oppScore').value = 7;
+                    selectQuarter(2);
+                    document.getElementById('minutes').value = 6;
+                    document.getElementById('seconds').value = 0;
+                    break;
+            }
+            
+            updateFieldVisual();
+            updateStrengthDisplay();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateFieldVisual();
+            updateStrengthDisplay();
+            calculateDecision();
+            
+            // Add event listeners for real-time updates
+            ['yourScore', 'oppScore', 'minutes', 'seconds'].forEach(id => {
+                document.getElementById(id).addEventListener('input', calculateDecision);
+            });
+            
+            document.getElementById('gameContext').addEventListener('change', calculateDecision);
+        });
+    </script>
+</body>
+</html>
